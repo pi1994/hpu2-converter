@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>B?ng quy ??i t??ng ???ng ?i?m tr?ng tuy?n gi?a c?c ph??ng th?c x?t tuy?n ??i h?c ch?nh quy n?m 2026</title>
+  <title>Bảng quy đổi tương đương điểm trúng tuyển giữa các phương thức xét tuyển đại học chính quy năm 2026</title>
   <style>
     :root { color-scheme: light; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #f3f6fa; color: #16243a; font: 16px/1.5 Arial, sans-serif; }
+    body { margin: 0; background: #f3f6fa; color: #16243a; font: 16px/1.5 "Segoe UI", "Noto Sans", Arial, sans-serif; }
     main { max-width: 1240px; margin: 32px auto; padding: 28px; background: #fff; box-shadow: 0 3px 18px #13233a1c; }
     h1 { margin: 0 0 8px; color: #003b75; font-size: clamp(1.45rem, 3vw, 2.1rem); }
     h2 { color: #003b75; }
@@ -26,16 +26,19 @@
     select, input, button { min-height: 38px; padding: 7px 9px; border: 1px solid #7896b5; border-radius: 4px; font: inherit; }
     button { margin-top: 18px; color: #fff; background: #005da8; border-color: #005da8; cursor: pointer; font-weight: 700; }
     output { display: block; min-height: 28px; margin-top: 14px; font-weight: 700; }
+    .formula { display: block; margin-top: 5px; color: #314d6c; font-weight: 400; }
+    .notes { margin-top: 18px; padding: 10px 14px; border-left: 4px solid #e09a18; background: #fff9e9; color: #5a430e; }
+    .notes p { margin: 5px 0; }
     @media print { body { background: #fff; } main { margin: 0; max-width: none; box-shadow: none; } }
   </style>
 </head>
 <body>
   <main>
-    <h1>B?ng quy ??i t??ng ???ng ?i?m tr?ng tuy?n gi?a c?c ph??ng th?c x?t tuy?n ??i h?c ch?nh quy n?m 2026</h1>
+    <h1>Bảng quy đổi tương đương điểm trúng tuyển giữa các phương thức xét tuyển đại học chính quy năm 2026</h1>
     <p class="source">Nguồn dữ liệu: <a href="https://tuyensinh.hpu2.edu.vn/chi-tiet/bang-quy-doi-tuong-duong-diem-trung-tuyen-giua-cac-phuong-thuc-xet-tuyen-dai-hoc-chinh-quy-nam-2026.html">https://tuyensinh.hpu2.edu.vn/chi-tiet/bang-quy-doi-tuong-duong-diem-trung-tuyen-giua-cac-phuong-thuc-xet-tuyen-dai-hoc-chinh-quy-nam-2026.html</a>. File được tạo tự động từ các bảng trên trang nguồn.</p>
     <section class="calculator" aria-labelledby="calc-title">
       <h2 id="calc-title">Tính điểm quy đổi</h2>
-      <p>Chọn phương thức, tổ hợp và chiều quy đổi; kết quả được nội suy tuyến tính theo khoảng điểm trong bảng công bố.</p>
+      <p>Chọn ngành học, phương thức và chiều quy đổi; kết quả được nội suy tuyến tính theo khoảng điểm trong bảng công bố.</p>
       <div class="calc-grid">
         <label>Ngành học<select id="program"></select></label>
         <label>Phương thức quy đổi<select id="method"></select></label>
@@ -45,6 +48,11 @@
       </div>
       <button id="calculate" type="button">Tính điểm</button>
       <output id="result" aria-live="polite"></output>
+      <div class="notes">
+        <p><strong>Lưu ý:</strong> Công cụ không tự cộng điểm ưu tiên và không thay thế kết quả xét tuyển chính thức của Nhà trường.</p>
+        <p>Các tổ hợp trong cùng một ngành được quy đổi theo tổ hợp gốc của ngành đó.</p>
+        <p><strong>Ví dụ:</strong> Điểm theo khối A01 khi xét ngành Sư phạm Vật lý được quy đổi theo công thức tổ hợp gốc A01; khi xét ngành Sư phạm Toán học thì quy đổi theo công thức tổ hợp gốc A00.</p>
+      </div>
     </section>
     <section class="table-wrap"><table align="center" border="1" style="width:100%;" width="100%">
 
@@ -2450,7 +2458,11 @@
       if (!row) { result.textContent = `Điểm ${value} không thuộc khoảng được công bố cho tổ hợp ${combination.value}.`; return; }
       const [a, b, c, d] = row; const reverse = direction.value.startsWith(method.value);
       const converted = reverse ? a + (value - c) * (b - a) / (d - c) : c + (value - a) * (d - c) / (b - a);
-      result.textContent = `Kết quả: ${converted.toFixed(2).replace('.', ',')} điểm ${reverse ? 'THPT' : method.value} (tổ hợp ${combination.value}).`;
+      const target = reverse ? 'THPT' : method.value;
+      const formula = reverse
+        ? `THPT = ${a} + (${value} − ${c}) × (${b} − ${a}) / (${d} − ${c})`
+        : `${method.value} = ${c} + (${value} − ${a}) × (${d} − ${c}) / (${b} − ${a})`;
+      result.innerHTML = `Kết quả: ${converted.toFixed(2).replace('.', ',')} điểm ${target} (tổ hợp ${combination.value}).<span class="formula">Công thức: ${formula} = ${converted.toFixed(2).replace('.', ',')}</span>`;
     });
     refresh();
   </script>
