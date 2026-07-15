@@ -41,15 +41,19 @@
       <p>Chọn ngành học, phương thức và chiều quy đổi; kết quả được nội suy tuyến tính theo khoảng điểm trong bảng công bố.</p>
       <div class="calc-grid">
         <label>Ngành học<select id="program"></select></label>
-        <label>Phương thức quy đổi<select id="method"></select></label>
+        <label>Hình thức tính<select id="mode"><option value="single">Quy đổi một phương thức</option><option value="all">THPT → tất cả phương thức khả dụng</option></select></label>
+        <label id="method-wrap">Phương thức quy đổi<select id="method"></select></label>
         <label>Tổ hợp gốc của ngành<input id="combination" readonly></label>
-        <label>Chiều quy đổi<select id="direction"></select></label>
+        <label id="direction-wrap">Chiều quy đổi<select id="direction"></select></label>
         <label id="score-label">Điểm cần quy đổi<input id="score" type="text" inputmode="decimal" placeholder="Ví dụ: 25,5"></label>
       </div>
       <button id="calculate" type="button">Tính điểm</button>
       <output id="result" aria-live="polite"></output>
       <div class="notes">
         <p><strong>Lưu ý:</strong> Công cụ không tự cộng điểm ưu tiên và không thay thế kết quả xét tuyển chính thức của Nhà trường.</p>
+        <p>Việc quy đổi chỉ mang tính chất tham khảo. Khi Trường công bố điểm trúng tuyển theo phương thức sử dụng kết quả thi tốt nghiệp THPT, công cụ sẽ quy đổi sang điểm trúng tuyển theo các phương thức tương ứng. Thí sinh so sánh điểm của mình với điểm trúng tuyển của phương thức tương ứng.</p>
+        <p>Thông tin chính thức tham khảo từ cổng thông tin của Trường và Cổng thông tin tuyển sinh của Bộ Giáo dục và Đào tạo.</p>
+        <p><strong>Phạm vi xét học bạ:</strong> chỉ áp dụng cho các ngành Giáo dục Mầm non, Giáo dục Thể chất, Giáo dục Công dân, Sư phạm Tin học, Công nghệ thông tin, Khoa học vật liệu, Quản lý thể dục thể thao và Việt Nam học. Các ngành còn lại không quy đổi từ điểm THPT sang Học bạ.</p>
         <p>Các tổ hợp trong cùng một ngành được quy đổi theo tổ hợp gốc của ngành đó.</p>
         <p><strong>Ví dụ:</strong> Điểm theo khối A01 khi xét ngành Sư phạm Vật lý được quy đổi theo công thức tổ hợp gốc A01; khi xét ngành Sư phạm Toán học thì quy đổi theo công thức tổ hợp gốc A00.</p>
       </div>
@@ -2420,36 +2424,61 @@
   <script>
     const data = {"SP2E": {"A00": [[27.75, 30, 25.24, 30], [22.85, 27.75, 18.29, 25.24], [18.95, 22.85, 14.6, 18.29], [15, 18.95, 10.96, 14.6]], "A01": [[26.26, 30, 25.43, 30], [18.34, 26.26, 17.13, 25.43], [15, 18.34, 13.61, 17.13]], "B00": [[27.74, 30, 22.77, 30], [19.27, 27.74, 13.41, 22.77], [15, 19.27, 10.02, 13.41]], "B03": [[25.31, 30, 19.08, 30], [19.75, 25.31, 14.23, 19.08], [15, 19.75, 10.48, 14.23]], "C00": [[28, 30, 25.94, 30], [24.75, 28, 22.95, 25.94], [20, 24.75, 19.37, 22.95], [15, 20, 12.86, 19.37]], "D01": [[26, 30, 23.76, 30], [20, 26, 17.76, 23.76], [15, 20, 11.92, 17.76]], "D14": [[27, 30, 25.96, 30], [20.25, 27, 19.79, 25.96], [15, 20.25, 12.87, 19.79]], "X70": [[26.85, 30, 24.83, 30], [19.9, 26.85, 19.07, 24.83], [15, 19.9, 14.73, 19.07]], "M00": [[24.75, 30, 22.7, 30], [18.68, 24.75, 17.65, 22.7], [15, 18.68, 14.42, 17.65]], "T00": [[27, 30, 23.4, 30], [20.25, 27, 15.35, 23.4], [15, 20.25, 11.2, 15.35]]}, "H-SCA": {"A00": [[15, 20, 9.93, 14.15], [20, 25, 14.15, 21.16], [25, 30, 21.16, 27.14]], "A01": [[15, 20, 10.05, 16.31], [20, 25, 16.31, 21.83], [25, 30, 21.83, 26.29]], "B00": [[15, 20, 11.07, 14.04], [20, 25, 14.04, 21.06], [25, 30, 21.06, 26.0]], "B03": [[15, 20, 10.39, 15.52], [20, 25, 15.52, 20.8], [25, 30, 20.8, 24.96]], "D01": [[15, 20, 11.59, 16.87], [20, 25, 16.87, 21.83], [25, 30, 21.83, 28.18]]}, "Học bạ": {"A00": [[15, 20, 18, 23], [20, 25, 23, 28], [25, 27, 28, 30]], "A01": [[15, 20, 18, 23], [20, 25, 23, 28], [25, 27, 28, 30]], "D14": [[15, 20, 17, 22], [20, 25, 22, 27], [25, 27, 27, 29], [27, 28, 29, 30]], "T00": [[15, 20, 17, 22], [20, 25, 22, 27], [25, 27, 27, 29], [27, 28, 29, 30]], "M00": [[15, 20, 19, 24], [20, 25, 24, 29], [25, 26, 29, 30]], "X70": [[15, 20, 19, 24], [20, 25, 24, 29], [25, 26, 29, 30]]}};
     const programs = [["7140201", "Giáo dục Mầm non", "M00"], ["7140202", "Giáo dục Tiểu học", "D01"], ["7140204", "Giáo dục Công dân", "X70"], ["7140206", "Giáo dục Thể chất", "T00"], ["7140208", "Giáo dục Quốc phòng - An ninh", "C00"], ["7140209", "Sư phạm Toán học", "A00"], ["7140210", "Sư phạm Tin học", "A00"], ["7140211", "Sư phạm Vật lý", "A01"], ["7140212", "Sư phạm Hoá học", "A00"], ["7140213", "Sư phạm Sinh học", "B00"], ["7140217", "Sư phạm Ngữ văn", "C00"], ["7140218", "Sư phạm Lịch sử", "C00"], ["7140231", "Sư phạm Tiếng Anh", "D01"], ["7140247", "Sư phạm Khoa học tự nhiên", "B03"], ["7140249", "Sư phạm Lịch sử - Địa lí", "C00"], ["7220201", "Ngôn ngữ Anh", "D01"], ["7220204", "Ngôn ngữ Trung Quốc", "D01"], ["7310403", "Tâm lý học giáo dục", "D01"], ["7310630", "Việt Nam học", "D14"], ["7420201", "Công nghệ sinh học", "B00"], ["7440122", "Khoa học vật liệu", "A01"], ["7460112", "Toán ứng dụng", "A00"], ["7480201", "Công nghệ thông tin", "A00"], ["7520301", "Kỹ thuật hoá học", "A00"], ["7810301", "Quản lý thể dục thể thao", "T00"]];
+    const hocBaPrograms = new Set(["7140201", "7140204", "7140206", "7140210", "7310630", "7440122", "7480201", "7810301"]);
     const program = document.querySelector('#program');
+    const mode = document.querySelector('#mode');
     const method = document.querySelector('#method');
+    const methodWrap = document.querySelector('#method-wrap');
     const combination = document.querySelector('#combination');
     const direction = document.querySelector('#direction');
+    const directionWrap = document.querySelector('#direction-wrap');
     const score = document.querySelector('#score');
     const scoreLabel = document.querySelector('#score-label');
     const result = document.querySelector('#result');
     const labels = {'SP2E': 'Kỳ thi độc lập SP2E', 'H-SCA': 'Đánh giá năng lực H-SCA', 'Học bạ': 'Kết quả học bạ'};
     function fill(select, values) { select.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join(''); }
+    function methodsForProgram(selectedProgram) {
+      return Object.keys(data).filter(key => data[key][selectedProgram[2]] && (key !== 'Học bạ' || hocBaPrograms.has(selectedProgram[0])));
+    }
     function refresh() {
       if (!program.options.length) {
         program.innerHTML = programs.map((p, i) => `<option value="${i}">${p[0]} — ${p[1]}</option>`).join('');
       }
       const selectedProgram = programs[Number(program.value || 0)];
-      const availableMethods = Object.keys(data).filter(key => data[key][selectedProgram[2]]);
+      const availableMethods = methodsForProgram(selectedProgram);
       fill(method, availableMethods);
       method.value = availableMethods.includes(method.dataset.value) ? method.dataset.value : availableMethods[0];
       method.querySelectorAll('option').forEach(o => o.textContent = labels[o.value]);
       combination.value = selectedProgram[2];
       fill(direction, [`THPT → ${method.value}`, `${method.value} → THPT`]);
       direction.value = `${method.value} → THPT`;
-      scoreLabel.firstChild.textContent = `Điểm ${direction.value.split(' → ')[0]} cần quy đổi`;
+      const allMethods = mode.value === 'all';
+      methodWrap.hidden = allMethods;
+      directionWrap.hidden = allMethods;
+      scoreLabel.firstChild.textContent = allMethods ? 'Điểm THPT cần quy đổi' : `Điểm ${direction.value.split(' → ')[0]} cần quy đổi`;
       result.textContent = '';
     }
     program.addEventListener('change', refresh);
+    mode.addEventListener('change', refresh);
     method.addEventListener('change', () => { method.dataset.value = method.value; refresh(); });
     direction.addEventListener('change', () => { scoreLabel.firstChild.textContent = `Điểm ${direction.value.split(' → ')[0]} cần quy đổi`; result.textContent = ''; });
     document.querySelector('#calculate').addEventListener('click', () => {
       const value = Number(score.value.trim().replace(',', '.'));
       if (!Number.isFinite(value)) { result.textContent = 'Hãy nhập điểm hợp lệ (dùng dấu phẩy hoặc dấu chấm).'; return; }
+      if (mode.value === 'all') {
+        const selectedProgram = programs[Number(program.value || 0)];
+        const outputs = methodsForProgram(selectedProgram).flatMap(key => {
+          const row = data[key][combination.value]?.find(r => value >= Math.min(r[0], r[1]) - 1e-9 && value <= Math.max(r[0], r[1]) + 1e-9);
+          if (!row) return [];
+          const [a, b, c, d] = row;
+          const converted = c + (value - a) * (d - c) / (b - a);
+          const formula = `${key} = ${c} + (${value} − ${a}) × (${d} − ${c}) / (${b} − ${a})`;
+          return [`<span class="formula"><strong>${key}:</strong> ${converted.toFixed(2).replace('.', ',')} điểm. Công thức: ${formula} = ${converted.toFixed(2).replace('.', ',')}</span>`];
+        });
+        if (!outputs.length) { result.textContent = `Điểm THPT ${value} không thuộc khoảng được công bố cho tổ hợp ${combination.value}.`; return; }
+        result.innerHTML = `Kết quả quy đổi từ ${value} điểm THPT (tổ hợp ${combination.value}):${outputs.join('')}`;
+        return;
+      }
       const row = data[method.value][combination.value].find(r => {
         const [a, b, c, d] = r; const fromOther = direction.value.startsWith(method.value);
         const lo = Math.min(fromOther ? c : a, fromOther ? d : b); const hi = Math.max(fromOther ? c : a, fromOther ? d : b);
