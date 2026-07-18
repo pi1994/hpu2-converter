@@ -123,8 +123,9 @@
       if (!row) { result.textContent = `Điểm không nằm trong khung quy đổi.`; return; }
       const [a, b, c, d] = row; const reverse = direction.value.startsWith(method.value);
       const converted = reverse ? a + (value - c) * (b - a) / (d - c) : c + (value - a) * (d - c) / (b - a);
-      result.innerHTML = `Kết quả: ${converted.toFixed(2).replace('.', ',')} điểm.`;
+      result.textContent = `Kết quả: ${converted.toFixed(2).replace('.', ',')} điểm ${reverse ? 'THPT' : method.value} (tổ hợp ${combination.value}).`;
     });
+
     refresh();
   </script>
 </body>
